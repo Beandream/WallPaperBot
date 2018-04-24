@@ -13,6 +13,7 @@ client.on('message', msg => {
     var hi = str.search('hi');
     var help = str.search('help');
     var ping = str.search('ping');
+    var search = str.search('search');
     if(hi > -1){
       msg.channel.send(`Hello, ${msg.author.username}!`);
       return;
@@ -26,6 +27,22 @@ client.on('message', msg => {
       msg.channel.send('Pong');
       return;
     };
+    if(search > 0){
+
+      var textChannel = msg.guild.channels.find("name", "general");
+
+      textChannel.fetchMessages().then(messages => {
+        var filteredMsgCollection = messages.filter(msg =>{
+          return msg.content.search("hi") !== -1
+        })
+        
+        var messageArray = filteredMsgCollection.array();
+
+        msg.channel.send(`found ${messageArray.length} messages with the word hi`)
+
+      }).catch(console.error);  
+    }
+
   };
   console.log(msg.guild.available); 
 });
