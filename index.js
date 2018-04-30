@@ -33,10 +33,23 @@ client.on('message', msg => {
       textChannel.fetchMessages().then(messages => {
         var filteredMsgCollection = messages.filter(msg =>{
           if (msg.isMemberMentioned(client.user)){  
-            return msg.content.search("hi") !== -1 
+            let firstAttchmentArray = Array.from(msg.attachments.values());           
+            return msg.content.search("hi") !== -1 && firstAttchmentArray.length > 0
           };
         })
         var messageArray = filteredMsgCollection.array();
+
+        messageArray.forEach(message => {
+          let attachArray = Array.from(message.attachments.values()); 
+
+          attachArray.forEach(att => {
+            if(att.height > 0){
+              msg.channel.send(`found image`);
+              msg.channel.send(att.url);
+            }
+          })
+
+        })
         msg.channel.send(`found ${messageArray.length} messages with the word hi`)
       }).catch(console.error);
     };
