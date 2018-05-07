@@ -9,10 +9,10 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   if (msg.isMemberMentioned(client.user)){  
-    var str = (msg.content);
-    var hi = str.search('hi'||'Hi'||'HI');
-    var help = str.search('help'||'Help'||'HELP');
-    var submit = str.search('submit'||'Enter'||'Submit');
+    var str = msg.content.toUpperCase();
+    var hi = str.search('HI');
+    var help = str.search('HELP');
+    var submit = str.search('SUBMIT');
     if(hi > -1){
       msg.channel.send(`Hello, ${msg.author.username}!`);
       return;
@@ -58,7 +58,9 @@ client.on('message', msg => {
           Mymsg.delete(5000);
         });
       };
+      return;
     };
+    msg.channel.send('Say ***@Jamie help***, for more info')
   };
 });
  
