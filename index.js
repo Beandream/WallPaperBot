@@ -36,7 +36,7 @@ client.on('message', msg => {
                   submitError = true;
                 };
               })
-              if (submitError == false){
+              if (!submitError){
                 textChannel.send(`<@${msg.author.id}>`);
                 textChannel.send(att.url);
                 msg.channel.send('**Image Succesfully Submitted**');
