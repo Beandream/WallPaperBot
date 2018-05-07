@@ -23,7 +23,7 @@ client.on('message', msg => {
     };
     if (submit > -1){
       if (msg.channel.id == '442805569485537290'){
-        var submitError = -1;
+        var submitError = false;
         let attachArray = Array.from(msg.attachments.values()); 
         attachArray.forEach(att => {
           if(att.height > 0){
@@ -33,14 +33,13 @@ client.on('message', msg => {
               messageArray.forEach((Arraycontent) =>{
                 var msgSplit = Arraycontent[Arraycontent.length -1 ];
                 if (msgSplit.content.search(msg.author) > -1){
-                  submitError = 1;
+                  submitError = true;
                 };
               })
-              if (submitError < 1){
+              if (submitError == false){
                 textChannel.send(`<@${msg.author.id}>`);
                 textChannel.send(att.url);
                 msg.channel.send('**Image Succesfully Submitted**');
-                submitError = -1;
                 return;
               }
               msg.channel.send('**Error**-You Already Submitted An Image');
