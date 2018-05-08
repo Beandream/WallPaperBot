@@ -22,12 +22,12 @@ client.on('message', msg => {
       return;
     };
     if (submit > -1){
-      if (msg.channel.id == '442805569485537290'){
+      if (msg.channel.id == "442805569485537290" || msg.channel.id == "296728093702488084"|| msg.channel.id == "296726106067828737"){
         var submitError = false;
         let attachArray = Array.from(msg.attachments.values()); 
         attachArray.forEach(att => {
           if(att.height > 0){
-            var textChannel = msg.guild.channels.find("name", "a");
+            var textChannel = msg.guild.channels.find("name", "wallpaperbot");
             textChannel.fetchMessages().then(messages =>{
               let messageArray = Array.from(messages);
               messageArray.forEach((Arraycontent) =>{
@@ -42,24 +42,24 @@ client.on('message', msg => {
                 msg.channel.send('**Image Succesfully Submitted**');
                 return;
               }
-              msg.channel.send('**Error**-You Already Submitted An Image');
+              msg.channel.send('**Error**- You Already Submitted An Image');
             });
           }; 
         });
         if (!attachArray.length){
-          msg.channel.send('Please Submit An Image');  
+          msg.channel.send('Please include an Image in your message');  
         }; 
-      };
-      if (msg.channel.id !== '442805569485537290'){
-        msg.delete(0, 1);
-        var txtChannel = msg.guild.channels.find("name", "generalchat");
+      }else {
+        msg.delete();
+        var txtChannel = msg.guild.channels.find("name", "stills");
         msg.channel.send(`Please take this to ${txtChannel}, ${msg.author.username}!`).then (Mymsg => {
           Mymsg.delete(5000);
         });
+        return;
       };
       return;
     };
-    msg.channel.send('Say ***@Jamie help***, for more info')
+    msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
 });
  
