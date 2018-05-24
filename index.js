@@ -22,13 +22,13 @@ client.on('message', msg => {
       return;
     };
     if (submit > -1){
-      submit(msg);
+      submitMsg(msg);
     };
     msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
 });
  
-function submit(msg){
+function submitMsg(msg){
   if (msg.channel.id == "442805569485537290" || msg.channel.id == "296728093702488084"|| msg.channel.id == "296726106067828737"){
     var submitError = false;
     let attachArray = Array.from(msg.attachments.values()); 
