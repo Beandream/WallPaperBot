@@ -66,11 +66,15 @@ function submitMsg(msg){
   }else {
     msg.delete();
     var txtChannel = msg.guild.channels.find("name", "stills");
-    msg.channel.send(`Please take this to ${txtChannel}, ${msg.author.username}!`).then (Mymsg => {
-      Mymsg.delete(5000);
-    }).catch(error =>{
-      console.log(error)
-    });
+    if (txtChannel){
+      msg.channel.send(`Please take this to ${txtChannel}, ${msg.author.username}!`).then (Mymsg => {
+        Mymsg.delete(5000);
+      }).catch(error =>{
+        console.log(error)
+      });
+    }else{
+      console.log("#stills txtchannel doesn't exsist");
+    };
   };
 };
 
