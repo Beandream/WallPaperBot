@@ -22,45 +22,55 @@ client.on('message', msg => {
       return;
     };
     if (submit > -1){
-      if (msg.channel.id == "442805569485537290" || msg.channel.id == "296728093702488084"|| msg.channel.id == "296726106067828737"){
-        var submitError = false;
-        let attachArray = Array.from(msg.attachments.values()); 
-        attachArray.forEach(att => {
-          if(att.height > 0){
-            var textChannel = msg.guild.channels.find("name", "wallpaperbot");
-            textChannel.fetchMessages().then(messages =>{
-              let messageArray = Array.from(messages);
-              messageArray.forEach((Arraycontent) =>{
-                var msgSplit = Arraycontent[Arraycontent.length -1 ];
-                if (msgSplit.content.search(msg.author) > -1){
-                  submitError = true;
-                };
-              })
-              if (!submitError){
-                textChannel.send(`<@${msg.author.id}>`);
-                textChannel.send(att.url);
-                msg.channel.send('**Image Succesfully Submitted**');
-                return;
-              }
-              msg.channel.send('**Error**- You Already Submitted An Image');
-            });
-          }; 
-        });
-        if (!attachArray.length){
-          msg.channel.send('Please include an Image in your message');  
-        }; 
-      }else {
-        msg.delete();
-        var txtChannel = msg.guild.channels.find("name", "stills");
-        msg.channel.send(`Please take this to ${txtChannel}, ${msg.author.username}!`).then (Mymsg => {
-          Mymsg.delete(5000);
-        });
-        return;
-      };
-      return;
+      submit(msg);
     };
     msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
 });
  
+function submit(msg){
+  if (msg.channel.id == "442805569485537290" || msg.channel.id == "296728093702488084"|| msg.channel.id == "296726106067828737"){
+    var submitError = false;
+    let attachArray = Array.from(msg.attachments.values()); 
+    attachArray.forEach(att => {
+      if(att.height > 0){
+        var textChannel = msg.guild.channels.find("name", "wallpaperbot");
+        if(textChannel){
+          textChannel.fetchMessages().then(messages =>{
+            let messageArray = Array.from(messages);
+            messageArray.forEach((Arraycontent) =>{
+              var msgSplit = Arraycontent[Arraycontent.length -1 ];
+              if (msgSplit.content.search(msg.author) > -1){
+                submitError = true;
+              };
+            })
+            if (!submitError){
+              textChannel.send(`<@${msg.author.id}>`);
+              textChannel.send(att.url);
+              msg.channel.send('**Image Succesfully Submitted**');
+              return;
+            }
+            msg.channel.send('**Error**- You Already Submitted An Image');
+          }).catch(error =>{
+            console.log(error)
+          });
+        }else{
+          console.log("Textchannel doesn't exsist");
+        };
+      }; 
+    });
+    if (!attachArray.length){
+      msg.channel.send('Please include an Image in your message');  
+    }; 
+  }else {
+    msg.delete();
+    var txtChannel = msg.guild.channels.find("name", "stills");
+    msg.channel.send(`Please take this to ${txtChannel}, ${msg.author.username}!`).then (Mymsg => {
+      Mymsg.delete(5000);
+    }).catch(error =>{
+      console.log(error)
+    });
+  };
+};
+
 client.login(process.env.BOT_TOKEN);
