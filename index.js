@@ -23,6 +23,7 @@ client.on('message', msg => {
     };
     if (submit > -1){
       submitMsg(msg);
+      return;
     };
     msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
