@@ -64,7 +64,6 @@ function submitMsg(msg){
       msg.channel.send('Please include an Image in your message');  
     }; 
   }else {
-    msg.delete();
     var txtChannel = msg.guild.channels.find("name", "stills");
     if (txtChannel){
       msg.channel.send(`Please take this to ${txtChannel}, ${msg.author.username}!`).then (Mymsg => {
