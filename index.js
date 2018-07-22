@@ -7,6 +7,11 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+setInterval(function(){
+ console.log("heatbeat");
+ console.log(new Date()); 
+}, 180000);
+
 client.on('message', msg => {
  try {
    if (msg.isMemberMentioned(client.user)){  
@@ -32,7 +37,7 @@ client.on('message', msg => {
   console.log(error);
  }
 });
- 
+
 function submitMsg(msg){
   if (msg.channel.id == "442805569485537290" || msg.channel.id == "296728093702488084"|| msg.channel.id == "296726106067828737"){
     var submitError = false;
