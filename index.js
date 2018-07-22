@@ -8,7 +8,8 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if (msg.isMemberMentioned(client.user)){  
+ try {
+   if (msg.isMemberMentioned(client.user)){  
     var str = msg.content.toUpperCase();
     var hi = str.search('HI');
     var help = str.search('HELP');
@@ -27,6 +28,9 @@ client.on('message', msg => {
     };
     msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
+ } catch (error){
+  console.log(error);
+ }
 });
  
 function submitMsg(msg){
