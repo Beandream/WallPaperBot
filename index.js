@@ -7,11 +7,6 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-setInterval(function(){
- console.log("heatbeat");
- console.log(new Date()); 
-}, 180000);
-
 client.on('error', err => {console.log(err)});
 client.on('reconnecting' rcnct => {console.log('I am officially Trying to Reconnect')});
 
