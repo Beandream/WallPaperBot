@@ -12,6 +12,9 @@ setInterval(function(){
  console.log(new Date()); 
 }, 180000);
 
+client.on('error', err => {console.log(err)});
+client.on('reconnecting' rcnct => {console.log('I am officially Trying to Reconnect')});
+
 client.on('message', msg => {
  try {
    if (msg.isMemberMentioned(client.user)){  
