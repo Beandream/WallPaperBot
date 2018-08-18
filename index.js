@@ -35,10 +35,6 @@ client.on('message', msg => {
       submitMsg(msg);
       return;
     };
-    if (deletemsg > -1){
-      msgDel(msg);
-      return;
-    };
     if (delAll > -1 && confirm < 0){
       msg.channel.send(`Are You Sure you want to **delete** all messages from #wallpaperbot? \n "@${client.user.tag} DeleteAll Confirm" to confirm`);
       delAllConfirm = true;
@@ -52,6 +48,11 @@ client.on('message', msg => {
     }
     else {
       delAllConfirm = false;
+      return;
+    };
+    if (deletemsg > -1){
+      msgDel(msg);
+      return;
     };
     msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
