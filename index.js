@@ -1,6 +1,7 @@
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
+var delAllConfirm = false;
 // var key = require("./Key.js");
  
 client.on('ready', () => {
@@ -18,6 +19,10 @@ client.on('message', msg => {
     var help = str.search('HELP');
     var submit = str.search('SUBMIT');
     var deletemsg = str.search('DELETE');
+    if (msg.author.id == '284924421892734977' || msg.author.id == '277203191924391946'){
+      var delAll = str.search('DELETEALL');
+      var delConfirm = str.search('CONFIRM');
+    }
     if(hi > -1){
       msg.channel.send(`Hello, ${msg.author.username}!`);
       return;
@@ -34,6 +39,20 @@ client.on('message', msg => {
       msgDel(msg);
       return;
     };
+    if (delAll > -1 && confirm < 0){
+      msg.channel.send(`Are You Sure you want to **delete** all messages from #wallpaperbot? \n "@${client.user.tag} DeleteAll Confirm" to confirm`);
+      delAllConfirm = true;
+      return;
+    }
+    else if (delAll > -1 && confirm > -1 && delAllConfirm == true){
+      deleteAll(msg);
+      msg.channel.send('**Message Deletion Was Sussecful**');
+      delAllConfirm = false;
+      return;
+    }
+    else {
+      delAllConfirm = false;
+    };
     msg.channel.send('Say ***@WallPaperBot help***, for more info.')
   };
  } catch (error){
@@ -41,8 +60,20 @@ client.on('message', msg => {
  }
 });
 
+function deleteAll(msg){
+  var txtchnl = msg.guild.channels.find('name', 'wallpaperbot');
+  var msgsDeleted = 0;
+  txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
+    messages.forEach(msgs => {
+      msgs.delete();
+      msgsDeleted += 1;
+    })
+  }).catch(console.error)
+  msg.channel.send(`Deleted ${msgsDeleted} messages`);
+};
+
 function msgDel(msg){
-  var txtchnl = msg.guild.channels.find('name', 'wallpaperbot')
+  var txtchnl = msg.guild.channels.find('name', 'wallpaperbot');
   var msgDeleted = false;
   var msgImages;
   txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
