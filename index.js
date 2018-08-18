@@ -65,8 +65,8 @@ function deleteAll(msg){
   txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
     messages.forEach(msgs => {
       msgs.delete();
+      msgsDeleted++;
     });
-    msgsDeleted = messages.length;
   }).catch(console.error)
   msg.channel.send(`Deleted ${msgsDeleted} messages`);
 };
