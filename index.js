@@ -61,12 +61,12 @@ client.on('message', msg => {
 
 function deleteAll(msg){
   var txtchnl = msg.guild.channels.find('name', 'wallpaperbot');
-  var msgsDeleted = 0;
+  var msgsDeleted;
   txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
     messages.forEach(msgs => {
-      msgsDeleted ++;
       msgs.delete();
-    })
+    });
+    msgsDeleted = messages.length;
   }).catch(console.error)
   msg.channel.send(`Deleted ${msgsDeleted} messages`);
 };
