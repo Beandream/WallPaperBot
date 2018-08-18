@@ -70,7 +70,6 @@ function deleteAll(msg){
     });
   }).catch(console.error)
   msg.channel.send(`Deleted ${msgsDeleted} messages`);
-  msgsDeleted = 0;
 };
 
 function msgDel(msg){
