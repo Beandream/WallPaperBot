@@ -36,19 +36,17 @@ client.on('message', msg => {
       return;
     };
     if (delAll > -1 && delConfirm < 0){
-      msg.channel.send(`Are You Sure you want to **delete** all messages from #wallpaperbot? \n "@${client.user.tag} DeleteAll Confirm" to confirm`);
+      msg.channel.send(`Are You Sure you want to **delete** all messages from #wallpaperbot? \n **"DeleteAll Confirm" to confirm**`);
       delAllConfirm = true;
       return;
     }
     else if (delAll > -1 && delConfirm > -1 && delAllConfirm == true){
       deleteAll(msg);
-      msg.channel.send('**Message Deletion Was Sussecful**');
       delAllConfirm = false;
       return;
     }
     else {
       delAllConfirm = false;
-      return;
     };
     if (deletemsg > -1){
       msgDel(msg);
@@ -66,8 +64,8 @@ function deleteAll(msg){
   var msgsDeleted = 0;
   txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
     messages.forEach(msgs => {
+      msgsDeleted ++;
       msgs.delete();
-      msgsDeleted += 1;
     })
   }).catch(console.error)
   msg.channel.send(`Deleted ${msgsDeleted} messages`);
