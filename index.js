@@ -35,12 +35,12 @@ client.on('message', msg => {
       submitMsg(msg);
       return;
     };
-    if (delAll > -1 && confirm < 0){
+    if (delAll > -1 && delConfirm < 0){
       msg.channel.send(`Are You Sure you want to **delete** all messages from #wallpaperbot? \n "@${client.user.tag} DeleteAll Confirm" to confirm`);
       delAllConfirm = true;
       return;
     }
-    else if (delAll > -1 && confirm > -1 && delAllConfirm == true){
+    else if (delAll > -1 && delConfirm > -1 && delAllConfirm == true){
       deleteAll(msg);
       msg.channel.send('**Message Deletion Was Sussecful**');
       delAllConfirm = false;
