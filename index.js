@@ -2,6 +2,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 var delAllConfirm = false;
+var msgsDeleted = 0;
 // var key = require("./Key.js");
  
 client.on('ready', () => {
@@ -61,11 +62,11 @@ client.on('message', msg => {
 
 function deleteAll(msg){
   var txtchnl = msg.guild.channels.find('name', 'wallpaperbot');
-  var msgsDeleted;
+  msgsDeleted = 0;
   txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
     messages.forEach(msgs => {
       msgs.delete();
-      msgsDeleted++;
+      msgsDeleted += 1;
     });
   }).catch(console.error)
   msg.channel.send(`Deleted ${msgsDeleted} messages`);
@@ -74,7 +75,6 @@ function deleteAll(msg){
 function msgDel(msg){
   var txtchnl = msg.guild.channels.find('name', 'wallpaperbot');
   var msgDeleted = false;
-  var msgImages;
   txtchnl.fetchMessages({ limit: 100 }).then(function (messages){
     messages.forEach(msgs => {
       if (msgs.content.search(msg.author.id)> -1){
