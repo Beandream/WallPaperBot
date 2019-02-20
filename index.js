@@ -18,13 +18,27 @@ client.on('message', msg => {
         var del = str.search('DELETE');
         var delAll = str.search('DELALL');
 
-        if (submit > -1) {
-            if (msg.content.length - submit + 6 > 0 && disc > submit) {
-                getDisc(msg, disc);
-            } else {
-                getImg(msg);
+        cmdAllow = false;
+        data.servers.forEach(server => {
+            if (server.id == msg.guild.id) {
+                server.channel.submitChannels.forEach(channel => {
+                    if (msg.channel.id == channel.id) {
+                        cmdAllow = true;
+                    }
+                });
             }
+        });
 
+        if (submit > -1) {
+            if (cmdAllow) {
+                if (msg.content.length - submit + 6 > 0 && disc > submit) {
+                    getDisc(msg, disc);
+                } else {
+                    getImg(msg);
+                }
+            } else {
+                msg.channel.send("Can't use this command here.")
+            }
         }
         else if (help > -1) {
             msg.channel.send({
@@ -70,7 +84,11 @@ client.on('message', msg => {
             msg.channel.send(`Hello, ${msg.author}`);
         }
         else if (del > -1) {
-            delMsg(msg);
+            if (cmdAllow) {
+                delMsg(msg);
+            } else {
+                msg.channel.send("Can't use this command here.")
+            }
         }
         else if (delAll > -1) {
             let powerPerm = false;
@@ -107,7 +125,7 @@ function delMsg(msg) {
                             }
                         });
                     });
-                    if (i == false){
+                    if (i == false) {
                         msg.channel.send("**Error**- Could not find any submission.");
                     };
                     return;
