@@ -57,6 +57,10 @@ client.on('message', msg => {
                         {
                             name: "Submit !",
                             value: "Ability to add a description to your submission. Anything afer the exclamation point will be your description. ```@wallpaperbot Submit !This is a sample description! :)``` "
+                        },
+                        {
+                            name: "Delete",
+                            value: "Deletes your current submission. ```@wallpaperbot Delete``` "
                         }
                     ],
                 }
