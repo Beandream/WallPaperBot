@@ -11,7 +11,7 @@ client.on('error', err => { console.log(err) });
 client.on('message', msg => {
     if (msg.isMemberMentioned(client.user)) {
         var str = msg.content.toUpperCase();
-        var help = str.search('HELP')
+        var help = str.search('HELP');
         var hi = str.search('HI');
         var submit = str.search('SUBMIT');
         var disc = str.search('!');
@@ -72,7 +72,7 @@ client.on('message', msg => {
         else if (del > -1) {
             delMsg(msg);
         }
-        else if (delAll) {
+        else if (delAll > -1) {
             let powerPerm = false;
             data.powerUsers.forEach(powerUser => {
                 if (msg.author.id == powerUser.id) {
@@ -82,11 +82,11 @@ client.on('message', msg => {
             });
             if (!powerPerm) {
                 msg.channel.send("You do not have permission to use this command.")
-            }
+            };
         }
         else {
             msg.channel.send('Use "@wallpaperbot help" for a list of commands');
-        }
+        };
     }
 })
 
