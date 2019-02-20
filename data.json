@@ -1,0 +1,50 @@
+{
+    "servers": [
+        {
+            "name": "The Cynizenry",
+            "id": "296474051440934912",
+            "channels": {
+                "collectionChannel": {
+                    "id": "443083098461306890",
+                    "name": "wallpaperbot"
+                },
+                "submitChannels": [
+                    {
+                        "id": "296728093702488084",
+                        "name": "stills"
+                    },
+                    {
+                        "id": "296726106067828737",
+                        "name": "whatevs"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "BotDevs",
+            "id": "433758414880112640",
+            "channels": {
+                "collectionChannel": {
+                    "id": "477468411606204427",
+                    "name": "submissions"
+                },
+                "submitChannels": [
+                    {
+                        "id": "442805569485537290",
+                        "name": "generalchat"
+                    }
+                ]
+            }
+        }
+    ],
+    "powerUsers": [
+        {
+            "name": "AnxiousCynic",
+            "id": "284924421892734977"
+        },
+        {
+            "name": "Bean Dream",
+            "id": "277203191924391946"
+        }
+    ]
+}
