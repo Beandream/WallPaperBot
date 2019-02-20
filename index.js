@@ -21,7 +21,7 @@ client.on('message', msg => {
         cmdAllow = false;
         data.servers.forEach(server => {
             if (server.id == msg.guild.id) {
-                server.channel.submitChannels.forEach(channel => {
+                server.channels.submitChannels.forEach(channel => {
                     if (msg.channel.id == channel.id) {
                         cmdAllow = true;
                     }
