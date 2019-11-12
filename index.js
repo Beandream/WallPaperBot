@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const data = require("./data.json");
+const data = require("./dataV3.json");
+const version = "v3.0";
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -9,161 +10,76 @@ client.on('ready', () => {
 client.on('error', err => { console.log(err) });
 
 client.on('message', msg => {
-    if (msg.isMemberMentioned(client.user)) {
-        var str = msg.content.toUpperCase();
-        var help = str.search('HELP');
-        var hi = str.search('HI');
-        var submit = str.search('SUBMIT');
-        var disc = str.search('!');
-        var del = str.search('DELETE');
-        var delAll = str.search('DELALL');
+    if (msg.author.bot) return;
 
-        cmdAllow = false;
-        data.servers.forEach(server => {
-            if (server.id == msg.guild.id) {
-                server.channels.submitChannels.forEach(channel => {
-                    if (msg.channel.id == channel.id) {
-                        cmdAllow = true;
-                    }
-                });
+    data.servers.forEach(server => {
+        if (server.id == msg.guild.id) {
+            if (msg.channel.id == server.channel.id) {
+                readMsg(msg);
             }
-        });
-
-        if (submit > -1) {
-            if (cmdAllow) {
-                if (msg.content.length - submit + 6 > 0 && disc > submit) {
-                    getDisc(msg, disc);
-                } else {
-                    getImg(msg);
-                }
-            } else {
-                msg.channel.send("Can't use this command here.")
-            }
-        }
-        else if (help > -1) {
-            msg.channel.send({
-                embed: {
-                    color: 13508897,
-                    author: {
-                        name: "WallpaperBot",
-                        icon_url: "https://cdn.discordapp.com/attachments/442805569485537290/538882719451709441/wallpaperBot2.png"
-                    },
-                    thumbnail: {
-                        url: "https://cdn.discordapp.com/attachments/442805569485537290/538882719451709441/wallpaperBot2.png"
-                    },
-                    title: "**Commands**",
-                    footer: {
-                        text: 'Wallpaper Bot V2.0'
-                    },
-                    fields: [
-                        {
-                            name: "Help",
-                            value: "A list of commands. ```@wallpaperbot Help``` "
-                        },
-                        {
-                            name: "Hi",
-                            value: "Hello There! ```@wallpaperbot Hi``` "
-                        },
-                        {
-                            name: "Submit",
-                            value: "Submit an image to the wallpaper comp. Make sure to include an image as an attachment to your message. ```@wallpaperbot Submit``` "
-                        },
-                        {
-                            name: "Submit !",
-                            value: "Ability to add a description to your submission. Anything afer the exclamation point will be your description. ```@wallpaperbot Submit !This is a sample description! :)``` "
-                        },
-                        {
-                            name: "Delete",
-                            value: "Deletes your current submission. ```@wallpaperbot Delete``` "
-                        }
-                    ],
-                }
-            })
-        }
-        else if (hi > -1) {
-            msg.channel.send(`Hello, ${msg.author}`);
-        }
-        else if (del > -1) {
-            if (cmdAllow) {
-                delMsg(msg);
-            } else {
-                msg.channel.send("Can't use this command here.")
-            }
-        }
-        else if (delAll > -1) {
-            let powerPerm = false;
-            data.powerUsers.forEach(powerUser => {
-                if (msg.author.id == powerUser.id) {
-                    powerPerm = true;
-                    delAllSubmits(msg);
-                }
-            });
-            if (!powerPerm) {
-                msg.channel.send("You do not have permission to use this command.")
-            };
-        }
-        else {
-            msg.channel.send('Use "@wallpaperbot help" for a list of commands');
         };
-    }
+    });
+
 })
 
-function delMsg(msg) {
-    let i = false;
-    data.servers.forEach(server => {
-        if (server.id == msg.guild.id) {
-            msg.guild.channels.forEach(channel => {
-                if (channel.id == server.channels.collectionChannel.id) {
-                    channel.fetchMessages({ limit: 100 }).then(messages => {
-                        messages.forEach(message => {
-                            if (message.embeds[0]) {
-                                if (message.embeds[0].fields[0].value.search(msg.author.id) > -1) {
-                                    message.delete();
-                                    msg.channel.send("**Submission deleted!**");
-                                    i = true;
-                                }
-                            }
-                        });
-                    });
-                    if (i == false) {
-                        msg.channel.send("**Error**- Could not find any submission.");
-                    };
-                    return;
-                };
-            });
-            return;
-        }
-    })
-}
-
-function delAllSubmits(msg) {
-    data.servers.forEach(server => {
-        if (server.id == msg.guild.id) {
-            msg.guild.channels.forEach(channel => {
-                if (channel.id == server.channels.collectionChannel.id) {
-                    channel.fetchMessages({ limit: 100 }).then(messages => {
-                        messages.forEach(message => {
-                            if (message.author.id == client.user.id) {
-                                message.delete();
-                            }
-                        });
-                    });
-                    return;
-                };
-            });
-            return;
-        }
-    })
-}
-
-function getDisc(msg, discInit) {
-    var disc = msg.content.slice(discInit + 1);
-    if (disc.length < 401) {
-        getImg(msg, disc);
+function readMsg(msg) {
+    if (msg.isMemberMentioned(client.user)) {
+        runCmd(msg);
+        deleteMsg(msg, 100);
     } else {
-        msg.channel.send("**Your description is too long.** Limit: 400 characters")
+        getImg(msg);
     }
+}
 
+function runCmd(msg) {
+    var str = msg.content.toUpperCase();
+
+    var help = str.search('HELP');
+    var hi = str.search('HI');
+    var del = str.search('DELETE');
+
+    if (help > -1) {
+        msgHelp(msg);
+    } else if (hi > -1) {
+        msg.channel.send(`Hello, ${msg.author}`).then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
+    } else if (del > -1) {
+        if (msg.author.id == "277203191924391946") {
+            deleteAll(msg);
+        } else {
+            msg.channel.send("**Hey! you're not Beandream!**").then(botMsg => { deleteMsg(botMsg, 5000); }).catch();;
+        }
+    } else {
+        getImg(msg);
+    }
+}
+
+function msgHelp(msg) {
+    msg.channel.send({
+        embed: {
+            color: 4570716,
+            author: {
+                name: "WallpaperBot",
+                icon_url: "https://cdn.discordapp.com/attachments/442805569485537290/538882719451709441/wallpaperBot2.png"
+            },
+            thumbnail: {
+                url: "https://cdn.discordapp.com/attachments/442805569485537290/538882719451709441/wallpaperBot2.png"
+            },
+            title: "How to Submit",
+            footer: {
+                text: `Wallpaper Bot ${version}`
+            },
+            fields: [
+                {
+                    name: "**Upload an image through discord**",
+                    value: "```Using a link will not work.```"
+                },
+                {
+                    name: "**Include a message to your message for a description**",
+                    value: "```Any text you send with the message will be included as a description to your wallpaper.```"
+                }
+            ],
+        }
+    }).then(botMsg => { deleteMsg(botMsg, 15000); }).catch();
 }
 
 function getImg(msg, disc) {
@@ -171,14 +87,38 @@ function getImg(msg, disc) {
         let attachArray = Array.from(msg.attachments.values());
         var imgUrl = attachArray[0].url
         var fileName = attachArray[0].filename
+        var disc = msg.content;
         if (imgUrl.slice(imgUrl.length - 3) == "png" || imgUrl.slice(imgUrl.length - 3) == "jpg") {
             makeEmbed(msg, imgUrl, fileName, disc);
         } else {
-            msg.channel.send("**This file format is unsupported.** Please use .png or a .jpg");
+            msg.channel.send("**This file format is unsupported.** Please use .png or a .jpg").then(botMsg => {
+                deleteMsg(botMsg, 5000);
+            }).catch();
         };
     } else {
-        msg.channel.send("**Please an include image to your message**");
+        msg.channel.send("**Please include an image to your message**").then(botMsg => {
+            deleteMsg(botMsg, 5000);
+        });
+        deleteMsg(msg, 100);
     };
+}
+
+function deleteAll(msg) {
+    data.servers.forEach(server => {
+        if (server.id == msg.guild.id) {
+            if (msg.channel.id == server.channel.id) {
+                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
+                    messages.forEach(message => {
+                        if (message.author.id == client.user.id) {
+                            deleteMsg(message, 0);
+                        }
+                    });
+                });
+                return;
+            };
+            return;
+        }
+    })
 }
 
 function makeEmbed(msg, url, fileName, disc) {
@@ -196,7 +136,7 @@ function makeEmbed(msg, url, fileName, disc) {
             },
             url: url,
             footer: {
-                text: 'Use "@wallpaperbot help" for more info'
+                text: `Wallpaper Bot ${version}`
             },
             image: {
                 url: url
@@ -208,43 +148,46 @@ function makeEmbed(msg, url, fileName, disc) {
         }
     }
 
-    let idGuildMatch = false;
-    let idChannelMatch = false;
-    let alreadySubmit = false;
+    msg.channel.send(msgEmbed).then(message => {
+        message.react("👍");
+        checkSubmission(msg);
+        deleteMsg(msg, 100);
+    });
+}
+
+function checkSubmission(msg) {
+    var count = 0;
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
-            msg.guild.channels.forEach(channel => {
-                if (channel.id == server.channels.collectionChannel.id) {
-                    channel.fetchMessages({ limit: 100 }).then(messages => {
-                        messages.forEach(message => {
-                            if (message.embeds[0]) {
-                                if (message.embeds[0].fields[0].value.search(msg.author.id) > -1) {
-                                    msg.channel.send("**Image not submitted** You already have an image submitted. Use Delete to remove your submission. ```@wallpaperbot delete```")
-                                    alreadySubmit = true;
-                                }
-                            }
-                        });
-                        if (!alreadySubmit) {
-                            channel.send(msgEmbed);
-                            msg.channel.send("**Submission Successful!**")
+            if (msg.channel.id == server.channel.id) {
+                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
+                    messages.forEach(message => {
+                        if (message.embeds[0] && message.embeds[0].fields[0].value.search(msg.author.id) > -1) {
+                            count++;
+                            if (count > 1) {
+                                deleteMsg(message, 0);
+                            };
                         };
                     });
-                    idChannelMatch = true;
-                    return;
-                };
-            });
-            if (!idChannelMatch) {
-                console.log("No channel ID's Matched! msgEmbed did not send");
-                msg.channel.send("**It seems an error has occurred. please panic now. .NoChannel. ");
-            }
-            idGuildMatch = true;
+                });
+                return;
+            };
             return;
         };
     });
-    if (!idGuildMatch) {
-        console.log("No Server ID's Matched! msgEmbed did not send");
-        msg.channel.send("**It seems an error has occurred. please panic now. .NoServer.");
-    }
+}
+
+function deleteMsg(msg, delay) {
+    data.servers.forEach(server => {
+        if (server.id == msg.guild.id) {
+            if (msg.channel.id == server.channel.id) {
+                msg.delete(delay).catch(err => {
+                    console.log(`Missing MANAGE_MESSAGES permissions to delete ${msg.author.username}'s message`);
+                    console.log(err);
+                });
+            };
+        };
+    });
 }
 
 client.login(process.env.BOT_TOKEN);

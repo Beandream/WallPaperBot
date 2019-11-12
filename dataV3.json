@@ -1,0 +1,20 @@
+{
+    "servers": [
+        {
+            "name": "The Cynizenry",
+            "id": "296474051440934912",
+            "channel": {
+                    "id": "443083098461306890",
+                    "name": "wallpaperbot"
+            }
+        },
+        {
+            "name": "BotDevs",
+            "id": "433758414880112640",
+            "channel": {
+                    "id": "477468411606204427",
+                    "name": "submissions"
+            }
+        }
+    ]
+}
