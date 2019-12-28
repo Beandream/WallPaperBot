@@ -18,7 +18,17 @@
                         "name": "whatevs"
                     }
                 ]
-            }
+            },
+            "powerUsers": [
+                {
+                    "name": "AnxiousCynic",
+                    "id": "284924421892734977"
+                },
+                {
+                    "name": "Bean Dream",
+                    "id": "277203191924391946"
+                }
+            ]
         },
         {
             "name": "BotDevs",
@@ -32,9 +42,19 @@
                     {
                         "id": "442805569485537290",
                         "name": "generalchat"
+                    },
+                    {
+                        "id": "547863103459557377",
+                        "name": "oof"
                     }
                 ]
-            }
+            },
+            "powerUsers": [
+                {
+                    "name": "Bean Dream",
+                    "id": "277203191924391946"
+                }
+            ]
         }
     ],
     "powerUsers": [

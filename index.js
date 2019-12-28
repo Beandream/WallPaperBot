@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const data = require("./dataV3.json");
-const version = "v3.0";
+const version = "v4.0";
+var currentSubmits = [];
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -25,7 +26,6 @@ client.on('message', msg => {
 function readMsg(msg) {
     if (msg.isMemberMentioned(client.user)) {
         runCmd(msg);
-        deleteMsg(msg, 100);
     } else {
         getImg(msg);
     }
@@ -50,7 +50,9 @@ function runCmd(msg) {
         }
     } else {
         getImg(msg);
+        return;
     }
+    deleteMsg(msg, 100);
 }
 
 function msgHelp(msg) {
@@ -83,17 +85,24 @@ function msgHelp(msg) {
 }
 
 function getImg(msg, disc) {
+
+
     if (msg.attachments.size > 0) {
         let attachArray = Array.from(msg.attachments.values());
         var imgUrl = attachArray[0].url
         var fileName = attachArray[0].filename
         var disc = msg.content;
+        var username = msg.author.username;
+        var avatarURL = msg.author.avatarURL
+        var authorId = msg.author.id;
         if (imgUrl.slice(imgUrl.length - 3) == "png" || imgUrl.slice(imgUrl.length - 3) == "jpg") {
-            makeEmbed(msg, imgUrl, fileName, disc);
+            checkSubmission(msg);
+            makeEmbed(msg, username, avatarURL, authorId, imgUrl, fileName, disc);
         } else {
             msg.channel.send("**This file format is unsupported.** Please use .png or a .jpg").then(botMsg => {
                 deleteMsg(botMsg, 5000);
             }).catch();
+            deleteMsg(msg, 100);
         };
     } else {
         msg.channel.send("**Please include an image to your message**").then(botMsg => {
@@ -109,9 +118,7 @@ function deleteAll(msg) {
             if (msg.channel.id == server.channel.id) {
                 msg.channel.fetchMessages({ limit: 100 }).then(messages => {
                     messages.forEach(message => {
-                        if (message.author.id == client.user.id) {
-                            deleteMsg(message, 0);
-                        }
+                        deleteMsg(message, 0);
                     });
                 });
                 return;
@@ -121,18 +128,18 @@ function deleteAll(msg) {
     })
 }
 
-function makeEmbed(msg, url, fileName, disc) {
+function makeEmbed(userMsg, username, avatarURL, authorId, url, fileName, disc) {
     msgEmbed = {
         embed: {
             color: 3447003,
             author: {
-                name: msg.author.username,
-                icon_url: msg.author.avatarURL
+                name: username,
+                icon_url: avatarURL
             },
             title: fileName,
             description: disc,
             thumbnail: {
-                url: msg.author.avatarURL
+                url: avatarURL
             },
             url: url,
             footer: {
@@ -143,30 +150,47 @@ function makeEmbed(msg, url, fileName, disc) {
             },
             fields: [{
                 name: "Creator:",
-                value: `<@${msg.author.id}>`
+                value: `<@${authorId}>`
             }],
         }
     }
 
-    msg.channel.send(msgEmbed).then(message => {
+    userMsg.channel.send(msgEmbed).then(message => {
         message.react("👍");
-        checkSubmission(msg);
-        deleteMsg(msg, 100);
+        // deleteMsg(msg, 100);
     });
 }
 
+function refreshList(subMessage, userMsg) {
+    if (subMessage.embeds[0]) {
+        var EmbededMsg = subMessage.embeds[0];
+        var authorId = EmbededMsg.fields[0].value;
+        authorId = authorId.replace(/\D/g,'');
+        var avatarURL = EmbededMsg.thumbnail.url;
+        var username = EmbededMsg.author.name;
+        makeEmbed(userMsg, username, avatarURL, authorId, EmbededMsg.url, EmbededMsg.title, EmbededMsg.description);
+        deleteMsg(subMessage, 0);
+    }
+}
+
 function checkSubmission(msg) {
-    var count = 0;
+    var imageCount = 0;
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
             if (msg.channel.id == server.channel.id) {
                 msg.channel.fetchMessages({ limit: 100 }).then(messages => {
                     messages.forEach(message => {
-                        if (message.embeds[0] && message.embeds[0].fields[0].value.search(msg.author.id) > -1) {
-                            count++;
-                            if (count > 1) {
+                        if (message.attachments.size > 0 && message.author.id == msg.author.id ) {
+                            imageCount++;
+                            if (imageCount > 1) {
                                 deleteMsg(message, 0);
-                            };
+                            }
+                        }
+
+                        if (message.embeds[0] && message.embeds[0].fields[0].value.search(msg.author.id) > -1) {
+                            deleteMsg(message, 0);
+                        } else {
+                            refreshList(message, msg);
                         };
                     });
                 });
@@ -175,6 +199,7 @@ function checkSubmission(msg) {
             return;
         };
     });
+
 }
 
 function deleteMsg(msg, delay) {
