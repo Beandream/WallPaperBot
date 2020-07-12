@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const data = require("./dataV3.json");
-const version = "v4.0";
+const version = "v5.0";
 var currentSubmits = [];
 
 client.on('ready', () => {
