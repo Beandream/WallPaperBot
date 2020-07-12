@@ -11,34 +11,49 @@ client.on('error', err => { console.log(err) });
 
 client.on('message', msg => {
     if (msg.author.bot) return;
-
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
-            if (msg.channel.id == server.channel.id) {
-                readMsg(msg);
+            if (msg.channel.id == server.videoChannel.id) {
+                readMsg(msg, "video");
+            } else if (msg.channel.id == server.imageChannel.id) {
+                readMsg(msg, "image");
             }
         };
     });
 })
 
-function readMsg(msg) {
+function readMsg(msg, channel) {
     if (msg.isMemberMentioned(client.user)) {
         runCmd(msg);
     } else {
-        if (isVideo(msg)){
-            console.log("Hello?");
+        if (channel == "video") {
+            if (isVideo(msg)){
+                cleanChannel(msg);
+            };
+        } else if (channel == "image")
+        if (isImage(msg)){
             cleanChannel(msg);
         };
     }
 }
 
+
 function cleanChannel(msg) { // removes all none submission messages from the submission textchannel
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
-            if (msg.channel.id == server.channel.id) {
+            if (msg.channel.id == server.videoChannel.id) { //check for videos
                 msg.channel.fetchMessages({ limit: 100 }).then(messages => {
                     messages.forEach(message => {
                         if (!isVideo(message)) {
+                            deleteMsg(message, 0);
+                        }
+                    });
+                });
+                return;
+            } else if (msg.channel.id == server.imageChannel.id) { //check for images
+                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
+                    messages.forEach(message => {
+                        if (!isImage(message)) {
                             deleteMsg(message, 0);
                         }
                     });
@@ -57,8 +72,25 @@ function isVideo (msg) {
         }
     } else if (msg.attachments.size > 0) {
         let attachArray = Array.from(msg.attachments.values());
-        let url = attachArray[0].url;
-        if (url.slice(url.length - 3) == "mp4" || url.slice(url.length - 3) == "mov" || url.slice(url.length - 3) == "mkv") {
+        let url = attachArray[0].url.toUpperCase();
+        if (url.slice(url.length - 3) == "MP4" || url.slice(url.length - 3) == "MOV" || url.slice(url.length - 3) == "MKV") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return false;
+}
+
+function isImage (msg) {
+    if (msg.embeds[0]) {
+        if (msg.embeds[0].image) {
+            return true;
+        }
+    } else if (msg.attachments.size > 0) {
+        let attachArray = Array.from(msg.attachments.values());
+        let url = attachArray[0].url.toUpperCase();
+        if (url.slice(url.length - 3) == "PNG" || url.slice(url.length - 3) == "JPG") {
             return true;
         } else {
             return false;
@@ -95,7 +127,7 @@ function runCmd(msg) {
 function deleteAll(msg) {
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
-            if (msg.channel.id == server.channel.id) {
+            if (msg.channel.id == server.videoChannel.id || msg.channel.id == server.imageChannel.id) {
                 msg.channel.fetchMessages({ limit: 100 }).then(messages => {
                     messages.forEach(message => {
                         deleteMsg(message, 0);
@@ -111,7 +143,7 @@ function deleteAll(msg) {
 function deleteMsg(msg, delay) {
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
-            if (msg.channel.id == server.channel.id) {
+            if (msg.channel.id == server.videoChannel.id || msg.channel.id == server.imageChannel.id) {
                 msg.delete(delay).catch(err => {
                     console.log(`Might be Missing MANAGE_MESSAGES permissions to delete ${msg.author.username}'s message`);
                     console.log(err);
