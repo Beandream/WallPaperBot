@@ -24,5 +24,11 @@
                 "name": "submissions"
         }
         }
+    ],
+    "mods": [
+        {"name": "Bean Dream",
+        "id": "277203191924391946"},
+        {"name": "AnxiousCynic",
+            "id": "284924421892734977"}
     ]
 }

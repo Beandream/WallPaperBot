@@ -104,11 +104,12 @@ function runCmd(msg) {
     } else if (clean > -1) {
         cleanChannel(msg);
     } else if (reset > -1) {
-        if (msg.author.id == "277203191924391946") {
+        data.mods.forEach(user => {
+            if (msg.author.id == user.id) {
             deleteAll(msg);
-        } else {
-            msg.channel.send("**Hey! you're not Beandream!**").then(botMsg => { deleteMsg(botMsg, 5000); }).catch();;
-        }
+            } else {
+                msg.channel.send("**Hey! you're not Beandream!**").then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
+            }})
     } else {
         return;
     }
