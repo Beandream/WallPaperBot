@@ -106,7 +106,8 @@ function runCmd(msg) {
     } else if (reset > -1) {
         data.mods.forEach(user => {
             if (msg.author.id == user.id) {
-            deleteAll(msg);
+                deleteAll(msg);
+                return;
             } else {
                 msg.channel.send("**Hey! you're not Beandream!**").then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
             }})
