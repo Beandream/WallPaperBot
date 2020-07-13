@@ -11,34 +11,23 @@ client.on('error', err => { console.log(err) });
 
 client.on('message', msg => {
     if (msg.author.bot) return;
-    readMsg(msg, getSubmissionType(msg));
-})
 
-function getSubmissionType(msg) {
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
             if (msg.channel.id == server.videoChannel.id) {
-                return "video";
+                if (isVideo(msg)){
+                    cleanChannel(msg);
+                };
             } else if (msg.channel.id == server.imageChannel.id) {
-                return "image";
+                if (isImage(msg)){
+                    cleanChannel(msg);
+                };
             }
         };
     });
-}
 
-function readMsg(msg, channel) {
-    if (msg.isMemberMentioned(client.user)) {
-        runCmd(msg);
-    }
-    if (channel == "video") {
-        if (isVideo(msg)){
-            cleanChannel(msg);
-        };
-    } else if (channel == "image")
-    if (isImage(msg)){
-        cleanChannel(msg);
-    };
-}
+    runCmd(msg);
+})
 
 function cleanChannel(msg) { // removes all none submission messages from the submission textchannel
     data.servers.forEach(server => {
