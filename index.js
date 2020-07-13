@@ -104,14 +104,12 @@ function runCmd(msg) {
     } else if (clean > -1) {
         cleanChannel(msg);
     } else if (reset > -1) {
-        if (data.mods.forEach(user => {
+        data.mods.forEach(user => {
             if (msg.author.id == user.id) {
                 deleteAll(msg);
                 return true;
             }
-        }) != true) {
-            msg.channel.send("**Hey! you're not a mod**").then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
-        }
+        })
     } else {
         return;
     }
