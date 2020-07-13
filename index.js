@@ -11,32 +11,34 @@ client.on('error', err => { console.log(err) });
 
 client.on('message', msg => {
     if (msg.author.bot) return;
+    readMsg(msg, getSubmissionType(msg));
+})
+
+function getSubmissionType(msg) {
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
             if (msg.channel.id == server.videoChannel.id) {
-                readMsg(msg, "video");
+                return "video";
             } else if (msg.channel.id == server.imageChannel.id) {
-                readMsg(msg, "image");
+                return "image";
             }
         };
     });
-})
+}
 
 function readMsg(msg, channel) {
     if (msg.isMemberMentioned(client.user)) {
         runCmd(msg);
-    } else {
-        if (channel == "video") {
-            if (isVideo(msg)){
-                cleanChannel(msg);
-            };
-        } else if (channel == "image")
-        if (isImage(msg)){
+    }
+    if (channel == "video") {
+        if (isVideo(msg)){
             cleanChannel(msg);
         };
-    }
+    } else if (channel == "image")
+    if (isImage(msg)){
+        cleanChannel(msg);
+    };
 }
-
 
 function cleanChannel(msg) { // removes all none submission messages from the submission textchannel
     data.servers.forEach(server => {
@@ -104,9 +106,12 @@ function runCmd(msg) {
     var hi = str.search('HI');
     var reset = str.search('RESET');
     var clean = str.search('CLEAN');
+    var help = str.search('HELP');
 
     if (hi > -1) {
         msg.channel.send(`Hello, ${msg.author}`).then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
+    } else if (help > -1) {
+        msg.channel.send("Currently running version: " + version);
     } else if (clean > -1) {
         cleanChannel(msg);
     } else if (reset > -1) {
@@ -116,9 +121,6 @@ function runCmd(msg) {
             msg.channel.send("**Hey! you're not Beandream!**").then(botMsg => { deleteMsg(botMsg, 5000); }).catch();;
         }
     } else {
-        if (isVideo(msg)){
-            cleanChannel(msg);
-        };
         return;
     }
     deleteMsg(msg, 500);
