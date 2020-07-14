@@ -1,19 +1,24 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const data = require("./dataV3.json");
-const version = "v5.0";
+const version = "v5.1";
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-});
-
+client.on('ready', () => {console.log(`Logged in as ${client.user.tag}!`)});
 client.on('error', err => { console.log(err) });
 
 client.on('message', msg => {
     if (msg.author.bot) return;
+    
+    if (msg.isMemberMentioned(client.user)) {
+        runCmd(msg);
+    } else {
+        checkMsgType(msg);
+    }
+})
 
+function checkMsgType(msg) {
     data.servers.forEach(server => {
-        if (server.id == msg.guild.id) {
+        if (msg.guild.id == server.id) {
             if (msg.channel.id == server.videoChannel.id) {
                 if (isVideo(msg)){
                     cleanChannel(msg);
@@ -25,15 +30,13 @@ client.on('message', msg => {
             }
         };
     });
-
-    runCmd(msg);
-})
+}
 
 function cleanChannel(msg) { // removes all none submission messages from the submission textchannel
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
             if (msg.channel.id == server.videoChannel.id) { //check for videos
-                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
+                msg.channel.fetchMessages({ limit: 50 }).then(messages => {
                     messages.forEach(message => {
                         if (!isVideo(message)) {
                             deleteMsg(message, 0);
@@ -42,7 +45,7 @@ function cleanChannel(msg) { // removes all none submission messages from the su
                 });
                 return;
             } else if (msg.channel.id == server.imageChannel.id) { //check for images
-                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
+                msg.channel.fetchMessages({ limit: 50 }).then(messages => {
                     messages.forEach(message => {
                         if (!isImage(message)) {
                             deleteMsg(message, 0);
@@ -98,22 +101,23 @@ function runCmd(msg) {
     var help = str.search('HELP');
 
     if (hi > -1) {
-        msg.channel.send(`Hello, ${msg.author}`).then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
+        sendMsg(msg, `Hello, ${msg.author}`, -1);
+        return;
     } else if (help > -1) {
-        msg.channel.send("Currently running version: " + version).then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
+        sendMsg(msg, "Current version: " + version, 5000);
     } else if (clean > -1) {
         cleanChannel(msg);
     } else if (reset > -1) {
         data.mods.forEach(user => {
             if (msg.author.id == user.id) {
                 deleteAll(msg);
-                return true;
             }
         })
     } else {
+        checkMsgType(msg);
         return;
     }
-    deleteMsg(msg, 500);
+    deleteMsg(msg, 2500);
 }
 
 function deleteAll(msg) {
@@ -135,14 +139,20 @@ function deleteAll(msg) {
 function deleteMsg(msg, delay) {
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
-            if (msg.channel.id == server.videoChannel.id || msg.channel.id == server.imageChannel.id) {
-                msg.delete(delay).catch(err => {
-                    console.log(`Might be Missing MANAGE_MESSAGES permissions to delete ${msg.author.username}'s message`);
-                    console.log(err);
-                });
-            };
+            msg.delete(delay).catch(err => {
+                console.log(`Might be Missing MANAGE_MESSAGES permissions to delete ${msg.author.username}'s message`);
+                console.log(err);
+            });
         };
     });
+}
+
+function sendMsg(msg, text, delay) {
+    msg.channel.send(text).then(myMsg => {
+        if (delay > -1) {
+            deleteMsg(myMsg, delay);
+        }
+    }).catch();
 }
 
 client.login(process.env.BOT_TOKEN);
