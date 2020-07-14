@@ -100,7 +100,7 @@ function runCmd(msg) {
     if (hi > -1) {
         msg.channel.send(`Hello, ${msg.author}`).then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
     } else if (help > -1) {
-        msg.channel.send("Currently running version: " + version);
+        msg.channel.send("Currently running version: " + version).then(botMsg => { deleteMsg(botMsg, 5000); }).catch();
     } else if (clean > -1) {
         cleanChannel(msg);
     } else if (reset > -1) {
