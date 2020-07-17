@@ -36,7 +36,7 @@ function cleanChannel(msg) { // removes all none submission messages from the su
     data.servers.forEach(server => {
         if (server.id == msg.guild.id) {
             if (msg.channel.id == server.videoChannel.id) { //check for videos
-                msg.channel.fetchMessages({ limit: 50 }).then(messages => {
+                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
                     messages.forEach(message => {
                         if (!isVideo(message)) {
                             deleteMsg(message, 0);
@@ -45,7 +45,7 @@ function cleanChannel(msg) { // removes all none submission messages from the su
                 });
                 return;
             } else if (msg.channel.id == server.imageChannel.id) { //check for images
-                msg.channel.fetchMessages({ limit: 50 }).then(messages => {
+                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
                     messages.forEach(message => {
                         if (!isImage(message)) {
                             deleteMsg(message, 0);
@@ -61,7 +61,7 @@ function cleanChannel(msg) { // removes all none submission messages from the su
 
 function isVideo (msg) {
     if (msg.embeds[0]) {
-        if (msg.embeds[0].video) {
+        if (msg.embeds[0].type == "video") {
             return true;
         }
     } else if (msg.attachments.size > 0) {
@@ -102,7 +102,6 @@ function runCmd(msg) {
 
     if (hi > -1) {
         sendMsg(msg, `Hello, ${msg.author}`, -1);
-        return;
     } else if (help > -1) {
         sendMsg(msg, "Current version: " + version, 5000);
     } else if (clean > -1) {
@@ -115,9 +114,7 @@ function runCmd(msg) {
         })
     } else {
         checkMsgType(msg);
-        return;
     }
-    deleteMsg(msg, 2500);
 }
 
 function deleteAll(msg) {
@@ -151,6 +148,7 @@ function sendMsg(msg, text, delay) {
     msg.channel.send(text).then(myMsg => {
         if (delay > -1) {
             deleteMsg(myMsg, delay);
+            deleteMsg(msg, delay);
         }
     }).catch();
 }
