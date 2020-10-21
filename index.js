@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const data = require("./data.json");
-const Key = require("./Key.js");
 const version = "v5.2";
 
 const imageChannels = [];
