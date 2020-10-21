@@ -1,7 +1,18 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const data = require("./dataV3.json");
-const version = "v5.1";
+const data = require("./data.json");
+const Key = require("./Key.js");
+const version = "v5.2";
+
+const imageChannels = [];
+const videoChannels = [];
+data.servers.forEach( s => {
+    imageChannels.push(s.imageChannel.id);
+});
+data.servers.forEach( s => {
+    videoChannels.push(s.videoChannel.id);
+});
+
 
 client.on('ready', () => {console.log(`Logged in as ${client.user.tag}!`)});
 client.on('error', err => { console.log(err) });
@@ -10,53 +21,47 @@ client.on('message', msg => {
     if (msg.author.bot) return;
     
     if (msg.isMemberMentioned(client.user)) {
-        runCmd(msg);
-    } else {
-        checkMsgType(msg);
+        checkCmd(msg);
+    }
+    if (imageChannels.includes(msg.channel.id)) {
+        let timeWait =  setTimeout(checkMsg, 1000); //wait until discord auto embeds video
+        function checkMsg() {
+            if (isImage(msg)) { // if msg is a image in the image submission channel
+                cleanChannel(msg, 'IMAGE');
+            }
+        }
+    } else if (videoChannels.includes(msg.channel.id)) {
+        let timeWait = setTimeout(checkMsg, 1000); //wait until discord auto embeds video
+        function checkMsg() {
+            if (isVideo(msg)) { // if msg is a video in the video submission channel
+                cleanChannel(msg, 'VIDEO');
+            }
+        }
     }
 })
 
-function checkMsgType(msg) {
-    data.servers.forEach(server => {
-        if (msg.guild.id == server.id) {
-            if (msg.channel.id == server.videoChannel.id) {
-                if (isVideo(msg)){
-                    cleanChannel(msg);
-                };
-            } else if (msg.channel.id == server.imageChannel.id) {
-                if (isImage(msg)){
-                    cleanChannel(msg);
-                };
-            }
-        };
-    });
-}
-
-function cleanChannel(msg) { // removes all none submission messages from the submission textchannel
-    data.servers.forEach(server => {
-        if (server.id == msg.guild.id) {
-            if (msg.channel.id == server.videoChannel.id) { //check for videos
-                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
-                    messages.forEach(message => {
-                        if (!isVideo(message)) {
-                            deleteMsg(message, 0);
-                        }
-                    });
-                });
-                return;
-            } else if (msg.channel.id == server.imageChannel.id) { //check for images
-                msg.channel.fetchMessages({ limit: 100 }).then(messages => {
-                    messages.forEach(message => {
-                        if (!isImage(message)) {
-                            deleteMsg(message, 0);
-                        }
-                    });
-                });
-                return;
-            };
-            return;
-        }
-    })
+function cleanChannel(msg, type, cmd) { // removes all none submission messages from the submission channel
+    if (type == 'VIDEO') { 
+        msg.channel.fetchMessages({ limit: 100 }).then(messages => { 
+            messages.forEach(message => {
+                if (!isVideo(message)) { // delete all non-video messages
+                    deleteMsg(message, 0);
+                } else if (message.id != msg.id && message.author.id == msg.author.id && !cmd) {
+                    deleteMsg(message, 0);
+                }
+            });
+        });
+    } else if (type == 'IMAGE') { 
+        msg.channel.fetchMessages({ limit: 100 }).then(messages => { 
+            messages.forEach(message => {
+                if (!isImage(message)) { // delete all non-image messages
+                    deleteMsg(message, 0);
+                } else if (message.id != msg.id && message.author.id == msg.author.id && !cmd) {
+                    deleteMsg(message, 0);
+                }
+            });
+        });
+    };
 }
 
 function isVideo (msg) {
@@ -69,16 +74,13 @@ function isVideo (msg) {
         let url = attachArray[0].url.toUpperCase();
         if (url.slice(url.length - 3) == "MP4" || url.slice(url.length - 3) == "MOV" || url.slice(url.length - 3) == "MKV") {
             return true;
-        } else {
-            return false;
         }
     }
-    return false;
 }
 
 function isImage (msg) {
     if (msg.embeds[0]) {
-        if (msg.embeds[0].image) {
+        if (msg.embeds[0].type == 'image') {
             return true;
         }
     } else if (msg.attachments.size > 0) {
@@ -86,14 +88,11 @@ function isImage (msg) {
         let url = attachArray[0].url.toUpperCase();
         if (url.slice(url.length - 3) == "PNG" || url.slice(url.length - 3) == "JPG") {
             return true;
-        } else {
-            return false;
         }
     }
-    return false;
 }
 
-function runCmd(msg) {
+function checkCmd(msg) {
     var str = msg.content.toUpperCase();
     var hi = str.search('HI');
     var reset = str.search('RESET');
@@ -105,15 +104,21 @@ function runCmd(msg) {
     } else if (help > -1) {
         sendMsg(msg, "Current version: " + version, 5000);
     } else if (clean > -1) {
-        cleanChannel(msg);
+        if (imageChannels.includes(msg.channel.id)) {
+            cleanChannel(msg, 'IMAGE', true)
+        } else if (videoChannels.includes(msg.channel.id)) {
+            cleanChannel(msg, 'VIDEO', true);
+        } else {
+            console.log(`Clean Command does not work in channel with id: ${msg.channel.id}`)
+        }
     } else if (reset > -1) {
-        data.mods.forEach(user => {
-            if (msg.author.id == user.id) {
-                deleteAll(msg);
-            }
-        })
-    } else {
-        checkMsgType(msg);
+        if (videoChannels.includes(msg.channel.id) || imageChannels.includes(msg.channel.id)){
+            data.mods.forEach(m => {
+                if (m.id == msg.author.id) {
+                    deleteAll(msg);
+                }
+            })
+        }
     }
 }
 
