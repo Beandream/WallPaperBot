@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import Discord from 'discord.js';
-const client = new Discord.Client();
-import Data from "./data.json";
+const client = new Discord.Client()
+import * as Data from "./data.json";
 const version = "v6.0";
 
 const imageChannels = [];
